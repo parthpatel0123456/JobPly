@@ -1,0 +1,22 @@
+# OpenClaw
+.openclaw/
+
+# Secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+
+# Backups
+*_backup/
+jobply.tar.gz
+
+# Personal files
+*.pdf
