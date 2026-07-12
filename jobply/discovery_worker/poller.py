@@ -137,6 +137,8 @@ class Poller:
         database.
         Returns:
         #     Number of new jobs stored
+        """
+        
         logger.debug("Fetching new issues from GitHub...")
         issues = self.client.fetch_issues()
         
@@ -386,32 +388,150 @@ class Poller:
     def _submit_application_via_openclaw(self, url: str, data: dict) -> bool:
         """
         Use OpenClaw's Chrome browser to fill out a job application form.
-        Attempts to fill common fields and submit.
-        Returns True if submission appears successful, False otherwise.
+
+        Uses the existing Chrome profile with Simplify already logged in.
+
+        Returns:
+            bool: True if application submission appears successful.
         """
         try:
             import openclaw
-            
-            # Open a new tab
+
+            logger.info(f"Opening application page: {url}")
+
             tab = openclaw.browser.action(
                 action="open",
                 url=url,
-                profile="chrome",  # uses CHROME_USER_DATA_DIR env var
+                profile="chrome",
             )
-            
-            # Wait for page to load
+
+            target_id = tab.get("targetId")
+
+            if not target_id:
+                logger.error("Failed to get browser target ID")
+                return False
+
             openclaw.browser.action(
                 action="wait",
                 timeoutMs=8000,
-                targetId=tab["targetId"]
+                targetId=target_id
             )
-            
-            # Helper to safely fill a field if it exists
-            def try_fill(selector, value):
+
+            def try_fill(field_name, value):
+                """
+                Attempt to fill a form field using common selectors.
+                """
+
                 if not value:
-                    return
-                # Try common selectors for the field
+                    return False
+
                 selectors = [
-                    f'input[name="{selector}"]',
-                    f'input[placeholder*="{selector}" i]',
-                    f'textarea[name="{selector
+                    f'input[name="{field_name}"]',
+                    f'input[id="{field_name}"]',
+                    f'input[placeholder*="{field_name}" i]',
+                    f'textarea[name="{field_name}"]',
+                    f'textarea[placeholder*="{field_name}" i]',
+                ]
+
+                for selector in selectors:
+                    try:
+                        result = openclaw.browser.action(
+                            action="fill",
+                            targetId=target_id,
+                            selector=selector,
+                            value=value,
+                        )
+
+                        if result:
+                            logger.info(
+                                f"Filled application field: {field_name}"
+                            )
+                            return True
+
+                    except Exception:
+                        continue
+
+                logger.debug(
+                    f"Unable to locate application field: {field_name}"
+                )
+
+                return False
+
+            # Fill common application fields
+            fields = {
+                "name": data.get("full_name"),
+                "full_name": data.get("full_name"),
+                "email": data.get("email"),
+                "phone": data.get("phone"),
+                "linkedin": data.get("linkedin"),
+                "gpa": data.get("gpa"),
+                "graduation": data.get("grad_year"),
+            }
+
+            for field, value in fields.items():
+                try_fill(field, value)
+
+            # Upload resume
+            resume_path = data.get("resume_path")
+
+            if resume_path:
+                try:
+                    openclaw.browser.action(
+                        action="upload",
+                        targetId=target_id,
+                        selector='input[type="file"]',
+                        filePath=resume_path,
+                    )
+
+                    logger.info("Resume uploaded successfully")
+
+                except Exception as e:
+                    logger.warning(
+                        f"Resume upload failed: {e}"
+                    )
+
+            # Fill cover letter if available
+            cover_letter = data.get("cover_letter")
+
+            if cover_letter:
+                try_fill(
+                    "cover_letter",
+                    cover_letter
+                )
+
+            # Click submit
+            try:
+                openclaw.browser.action(
+                    action="click",
+                    targetId=target_id,
+                    selector='button[type="submit"]'
+                )
+
+                logger.info(
+                    "Application submit button clicked"
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"Failed clicking submit button: {e}"
+                )
+                return False
+
+            # Wait for submission
+            openclaw.browser.action(
+                action="wait",
+                timeoutMs=5000,
+                targetId=target_id
+            )
+
+            logger.info(
+                "Application submission completed"
+            )
+
+            return True
+
+        except Exception as e:
+            logger.exception(
+                f"OpenClaw application automation failed: {e}"
+            )
+            return False
