@@ -107,7 +107,7 @@ class Poller:
             except Exception as e:
                 logger.error(f"Failed to load resume from {self.resume_path}: {e}")
                 self.resume_text = ""
-        # If neither text nor path provided, resume_text remains empty (will get placeholder later)
+        # If neither text nor path provided, res**educe_text remains empty (will get placeholder later)
 
     def _poll_once(self):
         """Perform a single polling cycle: discover, store, match, tailor, apply."""
@@ -134,9 +134,9 @@ class Poller:
         """
         Discover new internships from GitHub and store them in the database.
         
+        database.
         Returns:
-            Number of new jobs stored
-        """
+        #     Number of new jobs stored
         logger.debug("Fetching new issues from GitHub...")
         issues = self.client.fetch_issues()
         
@@ -376,10 +376,6 @@ class Poller:
                     f"Exception during application: {str(e)}"
                 )
                 failed_count += 1
-                ],
-                    f"Exception during application: {str(e)}"
-                )
-                failed_count += 1
                 continue
         
         logger.info(
@@ -418,21 +414,4 @@ class Poller:
                 selectors = [
                     f'input[name="{selector}"]',
                     f'input[placeholder*="{selector}" i]',
-                    f'textarea[name="{selector}"]',
-                ]
-                for sel in selectors:
-                    try:
-                        openclaw.browser.action(
-                            action="fill",
-                            targetId=tab["targetId"],
-                            selector=sel,
-                            value=value
-                        )
-                        return  # success on first that works
-                    except Exception:
-                        continue  # try next selector
-            
-            # Fill personal info
-            try_fill("full_name", data["full_name"])
-            try_fill("email", data["email"])
-            try_fill("phone
+                    f'textarea[name="{selector
