@@ -130,6 +130,21 @@ class Poller:
         
         logger.debug("Poll cycle completed")
 
+    def start(self):
+        """Start the polling loop."""
+        self.running = True
+
+        logger.info("Discovery worker started")
+
+        while self.running:
+            try:
+                self._poll_once()
+
+            except Exception as e:
+                logger.exception(f"Poll cycle failed: {e}")
+
+            time.sleep(config.POLL_INTERVAL)
+
     def _discover_and_store_jobs(self) -> int:
         """
         Discover new internships from GitHub and store them in the database.
