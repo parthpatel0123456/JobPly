@@ -1,6 +1,5 @@
 import logging
-import base64
-import requests
+import subprocess
 
 from . import config
 from .readme_parser import parse_readme
@@ -11,30 +10,21 @@ logger = logging.getLogger(__name__)
 
 class GitHubClient:
 
-    def __init__(self):
-        self.session = requests.Session()
-
-        self.session.headers.update(
-            config.get_github_headers()
-        )
-
-
     def fetch_jobs(self):
-
         try:
-
-            response = self.session.get(
-                config.GITHUB_README_URL,
-                timeout=10
+            result = subprocess.run(
+                [
+                    "curl",
+                    "-fsSL",
+                    config.GITHUB_README_URL,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=20,
+                check=True,
             )
 
-            response.raise_for_status()
-
-            data = response.json()
-
-            markdown = base64.b64decode(
-                data["content"]
-            ).decode("utf-8")
+            markdown = result.stdout
 
             jobs = parse_readme(markdown)
 
@@ -44,11 +34,18 @@ class GitHubClient:
 
             return jobs
 
+        except subprocess.CalledProcessError as e:
+            logger.error(
+                f"curl failed (exit {e.returncode}): {e.stderr.strip()}"
+            )
+            return []
+
+        except subprocess.TimeoutExpired:
+            logger.error("README fetch timed out")
+            return []
 
         except Exception as e:
-
-            logger.error(
+            logger.exception(
                 f"README fetch failed: {e}"
             )
-
             return []

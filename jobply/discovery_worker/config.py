@@ -15,8 +15,6 @@ DATA_DIR.mkdir(exist_ok=True)
 # Path to the SQLite database file
 DATABASE_PATH = DATA_DIR / "jobs.db"
 
-# GitHub API configuration
-GITHUB_API_URL = "https://api.github.com"
 # The repository to monitor for internships (format: "owner/repo")
 GITHUB_REPO = os.getenv(
     "GITHUB_REPO",
@@ -24,8 +22,9 @@ GITHUB_REPO = os.getenv(
 )
 
 GITHUB_README_URL = (
-    f"{GITHUB_API_URL}/repos/"
-    f"{GITHUB_REPO}/contents/README.md"
+    "https://raw.githubusercontent.com/"
+    "vanshb03/Summer2027-Internships/"
+    "main/README.md"
 )
 # Polling interval in seconds (default: 5 minutes)
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 300))
@@ -53,13 +52,3 @@ CREATE TABLE IF NOT EXISTS jobs (
     similarity_score REAL
 );
 """
-
-# Headers for GitHub API requests
-def get_github_headers(etag=None):
-    headers = {
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": USER_AGENT,
-    }
-    if etag:
-        headers["If-None-Match"] = etag
-    return headers
