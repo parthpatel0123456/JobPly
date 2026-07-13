@@ -56,7 +56,7 @@ class SkillMatcher:
         
         try:
             logger.info(f"Loading sentence-transformers model: {cls._model_name}")
-            cls._model = SentenceTransformer(cls._model_name)
+            cls._model = SentenceTransformer("./models/all-MiniLM-L6-v2")
             logger.info("Model loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load model {cls._model_name}: {str(e)}")
