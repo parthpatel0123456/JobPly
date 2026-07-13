@@ -147,36 +147,35 @@ class Poller:
 
     def _discover_and_store_jobs(self) -> int:
         """
-        Discover new internships from GitHub and store them in the database.
-        
-        database.
+        Fetch internships from the README and store any new jobs.
+
         Returns:
-        #     Number of new jobs stored
+            Number of newly stored jobs.
         """
-        
-        logger.debug("Fetching new issues from GitHub...")
+
+        logger.debug("Fetching jobs from GitHub README...")
         jobs = self.client.fetch_jobs()
-        
+
         if not jobs:
-            logger.debug("No new issues found (or not modified)")
+            logger.debug("No jobs discovered")
             return 0
-            
-        logger.info(f"Fetched {len(jobs)} issues from GitHub")
-        
+
+        logger.info(f"Fetched {len(jobs)} jobs from GitHub")
+
         new_count = 0
+
         for job in jobs:
-            job = self._convert_issue_to_job(jobs)
             if self.store.add_job(job):
                 new_count += 1
-                logger.info(f"Stored new job: {job['title']} at {job['company']}")
+                logger.info(
+                    f"Stored new job: {job['title']} at {job['company']}"
+                )
             else:
-                logger.debug(f"Job already seen: {job['title']}")
-        
-        if new_count > 0:
-            logger.info(f"Discovered and stored {new_count} new job(s)")
-        else:
-            logger.info("No new jobs to store (all were duplicates)")
-            
+                logger.debug(
+                    f"Job already exists: {job['title']}"
+                )
+
+        logger.info(f"Stored {new_count} new job(s)")
         return new_count
 
     def _match_new_jobs(self):
