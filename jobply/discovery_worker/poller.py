@@ -534,4 +534,7 @@ class Poller:
             logger.exception(
                 f"OpenClaw application automation failed: {e}"
             )
-            return False
+    
+
+    
+
