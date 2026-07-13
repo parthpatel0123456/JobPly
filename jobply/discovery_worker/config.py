@@ -24,9 +24,8 @@ GITHUB_REPO = os.getenv(
 )
 
 GITHUB_README_URL = (
-    "https://raw.githubusercontent.com/"
-    "vanshb03/Summer2027-Internships/"
-    "main/README.md"
+    f"{GITHUB_API_URL}/repos/"
+    f"{GITHUB_REPO}/contents/README.md"
 )
 # Polling interval in seconds (default: 5 minutes)
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 300))

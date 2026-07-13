@@ -1,4 +1,5 @@
 import logging
+import base64
 import requests
 
 from . import config
@@ -13,9 +14,9 @@ class GitHubClient:
     def __init__(self):
         self.session = requests.Session()
 
-        self.session.headers.update({
-            "User-Agent": config.USER_AGENT
-        })
+        self.session.headers.update(
+            config.get_github_headers()
+        )
 
 
     def fetch_jobs(self):
@@ -29,7 +30,11 @@ class GitHubClient:
 
             response.raise_for_status()
 
-            markdown = response.text
+            data = response.json()
+
+            markdown = base64.b64decode(
+                data["content"]
+            ).decode("utf-8")
 
             jobs = parse_readme(markdown)
 
