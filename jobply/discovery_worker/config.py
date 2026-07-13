@@ -18,7 +18,16 @@ DATABASE_PATH = DATA_DIR / "jobs.db"
 # GitHub API configuration
 GITHUB_API_URL = "https://api.github.com"
 # The repository to monitor for internships (format: "owner/repo")
-GITHUB_REPO = os.getenv("GITHUB_REPO", "your-org/internships")  # Example, to be set via environment
+GITHUB_REPO = os.getenv(
+    "GITHUB_REPO",
+    "vanshb03/Summer2027-Internships"
+)
+
+GITHUB_README_URL = (
+    "https://raw.githubusercontent.com/"
+    "vanshb03/Summer2027-Internships/"
+    "main/README.md"
+)
 # Polling interval in seconds (default: 5 minutes)
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 300))
 

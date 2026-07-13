@@ -155,17 +155,17 @@ class Poller:
         """
         
         logger.debug("Fetching new issues from GitHub...")
-        issues = self.client.fetch_issues()
+        jobs = self.client.fetch_jobs()
         
-        if not issues:
+        if not jobs:
             logger.debug("No new issues found (or not modified)")
             return 0
             
-        logger.info(f"Fetched {len(issues)} issues from GitHub")
+        logger.info(f"Fetched {len(jobs)} issues from GitHub")
         
         new_count = 0
-        for issue in issues:
-            job = self._convert_issue_to_job(issue)
+        for job in jobs:
+            job = self._convert_issue_to_job(jobs)
             if self.store.add_job(job):
                 new_count += 1
                 logger.info(f"Stored new job: {job['title']} at {job['company']}")
