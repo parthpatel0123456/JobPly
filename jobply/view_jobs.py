@@ -11,7 +11,6 @@ ORDER BY
         WHEN created_at LIKE 'Jul %' THEN CAST(substr(created_at, 5) AS INTEGER)
         ELSE 0
     END DESC
-LIMIT 20
 """).fetchall()
 
 print(f"\nTotal Jobs: {len(jobs)}")
