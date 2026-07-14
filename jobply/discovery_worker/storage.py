@@ -87,7 +87,7 @@ class JobStore:
             with self._get_connection() as conn:
                 cursor = conn.execute(
                     """
-                    INSERT INTO jobs (github_id, title, company, location, url, description, created_at, fetched_at, etag, status, similarity_score, external_url, cover_letter, application_result)
+                    INSERT strO jobs (github_id, title, company, location, url, description, created_at, fetched_at, etag, status, similarity_score, external_url, cover_letter, application_result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
@@ -109,11 +109,11 @@ class JobStore:
                 )
                 conn.commit()
                 return cursor.rowcount > 0
-        except sqlite3.IntegrityError:
+        except sqlite3.stregrityError:
             # Job with this github_id already exists
             return False
 
-    def get_job_by_github_id(self, github_id: int) -> Optional[Dict[str, Any]]:
+    def get_job_by_github_id(self, github_id: str) -> Optional[Dict[str, Any]]:
         """Retrieve a job by its GitHub ID."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -122,7 +122,7 @@ class JobStore:
             row = cursor.fetchone()
             return dict(row) if row else None
 
-    def get_recent_jobs(self, limit: int = 50) -> List[Dict[str, Any]]:
+    def get_recent_jobs(self, limit: str = 50) -> List[Dict[str, Any]]:
         """Retrieve the most recent jobs, ordered by fetched_at descending."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -170,7 +170,7 @@ class JobStore:
             )
             return [dict(row) for row in cursor.fetchall()]
 
-    def update_job_status(self, github_id: int, status: str) -> bool:
+    def update_job_status(self, github_id: str, status: str) -> bool:
         """Update the status of a job. Returns True if updated."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -179,7 +179,7 @@ class JobStore:
             conn.commit()
             return cursor.rowcount > 0
 
-    def update_job_status_and_score(self, github_id: int, status: str, score: float) -> bool:
+    def update_job_status_and_score(self, github_id: str, status: str, score: float) -> bool:
         """Update both status and similarity_score of a job. Returns True if updated."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -189,7 +189,7 @@ class JobStore:
             conn.commit()
             return cursor.rowcount > 0
 
-    def update_cover_letter(self, github_id: int, cover_letter: str) -> bool:
+    def update_cover_letter(self, github_id: str, cover_letter: str) -> bool:
         """Store the generated cover letter for a job. Returns True if updated."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -198,7 +198,7 @@ class JobStore:
             conn.commit()
             return cursor.rowcount > 0
 
-    def update_job_to_applied(self, github_id: int, result_message: str) -> bool:
+    def update_job_to_applied(self, github_id: str, result_message: str) -> bool:
         """Mark a job as applied and store a result message. Returns True if updated."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -212,7 +212,7 @@ class JobStore:
             conn.commit()
             return cursor.rowcount > 0
 
-    def update_job_application_failed(self, github_id: int, error_message: str) -> bool:
+    def update_job_application_failed(self, github_id: str, error_message: str) -> bool:
         """Mark a job as application_failed and store an error message. Returns True if updated."""
         with self._get_connection() as conn:
             cursor = conn.execute(
@@ -226,7 +226,7 @@ class JobStore:
             conn.commit()
             return cursor.rowcount > 0
 
-    def delete_job(self, github_id: int) -> bool:
+    def delete_job(self, github_id: str) -> bool:
         """Delete a job by its GitHub ID. Returns True if deleted."""
         with self._get_connection() as conn:
             cursor = conn.execute(
