@@ -198,21 +198,14 @@ class Poller:
             try:
                 # Determine which description to use for matching:
                 # Prefer external URL's content; fall back to issue body.
-                desc_source = job["description"]   # default to issue body
-                if job.get("external_url"):
-                    # Avoid re-fetching the same URL multiple times in one run
-                    cached = self._desc_cache.get(job["external_url"])
-                    if cached is not None:
-                        desc_source = cached
-                    else:
-                        fetched = get_job_description(
-                            job["external_url"],
-                            prefer_openclaw=False   # set True to force OpenClaw browser
-                        )
-                        if fetched is not None and len(fetched) > 0:
-                            desc_source = fetched
-                        # else keep issue body as fallback
-                        self._desc_cache[job["external_url"]] = desc_source
+                desc_source = job["description"]
+
+                if not desc_source:
+                    desc_source = (
+                        f"{job['title']} "
+                        f"{job['company']} "
+                        "software engineering internship"
+                    )
                 
                 # Compute similarity between resume and chosen description
                 similarity = self.matcher.match(self.resume_text, desc_source)

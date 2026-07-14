@@ -71,50 +71,49 @@ def fetch_via_http(url: str, timeout: int = 20) -> Optional[str]:
         return None
 
 
-def fetch_via_openclaw(url: str, timeout_sec: int = 20) -> Optional[str]:
+def fetch_via_openclaw(url: str, timeout_sec: int = 30):
     """
-    Use OpenClaw managed Chrome browser to get rendered text.
+    Use OpenClaw CLI browser to fetch rendered page text.
     """
 
     try:
-        import openclaw
+        import subprocess
 
-        tab = openclaw.browser.action(
-            action="open",
-            url=url,
-            profile="chrome",
+        # Open page
+        subprocess.run(
+            [
+                "openclaw",
+                "browser",
+                "open",
+                url,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout_sec,
+            check=True,
         )
 
-        target_id = tab.get("targetId")
-
-        if not target_id:
-            logger.error("No browser targetId returned")
-            return None
-
-        openclaw.browser.action(
-            action="wait",
-            timeoutMs=5000,
-            targetId=target_id,
+        # Get page snapshot/text
+        result = subprocess.run(
+            [
+                "openclaw",
+                "browser",
+                "snapshot",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout_sec,
+            check=True,
         )
 
-        result = openclaw.browser.action(
-            action="evaluate",
-            targetId=target_id,
-            javaScript="() => document.body.innerText",
-        )
+        if result.stdout:
+            return result.stdout.strip()
 
-        openclaw.browser.action(
-            action="close",
-            targetId=target_id,
-        )
-
-        text = result.get("value", "")
-
-        return text.strip() if text else None
+        return None
 
     except Exception as e:
         logger.error(
-            f"OpenClaw browser fetch failed for {url}: {e}"
+            f"OpenClaw CLI browser fetch failed for {url}: {e}"
         )
         return None
 
