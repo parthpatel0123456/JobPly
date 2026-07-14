@@ -109,7 +109,7 @@ class JobStore:
                 )
                 conn.commit()
                 return cursor.rowcount > 0
-        except sqlite3.stregrityError:
+        except sqlite3.IntegrityError:
             # Job with this github_id already exists
             return False
 
