@@ -7,10 +7,18 @@ jobs = conn.execute("""
 SELECT title, company, location, created_at, similarity_score, url
 FROM jobs
 ORDER BY 
-    CASE 
-        WHEN created_at LIKE 'Jul %' THEN CAST(substr(created_at, 5) AS INTEGER)
+    CASE substr(created_at, 1, 3)
+        WHEN 'Jul' THEN 7
+        WHEN 'Jun' THEN 6
+        WHEN 'May' THEN 5
+        WHEN 'Apr' THEN 4
+        WHEN 'Mar' THEN 3
+        WHEN 'Feb' THEN 2
+        WHEN 'Jan' THEN 1
         ELSE 0
-    END DESC
+    END DESC,
+    CAST(substr(created_at, 5) AS INTEGER) DESC,
+    similarity_score DESC
 """).fetchall()
 
 print(f"\nTotal Jobs: {len(jobs)}")
