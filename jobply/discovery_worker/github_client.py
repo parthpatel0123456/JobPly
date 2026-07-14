@@ -1,8 +1,6 @@
 import logging
-import subprocess
 import os
 
-from . import config
 from .readme_parser import parse_readme
 
 logger = logging.getLogger(__name__)
@@ -11,37 +9,20 @@ class GitHubClient:
 
     def fetch_jobs(self):
         try:
-            # Base curl command setup
-            curl_cmd = ["curl", "-fsSL"]
+            # Point directly to the uploaded markdown file inside the workspace
+            local_readme_path = "/sandbox/.openclaw/workspace/JobPly/jobply/Summer2027_README.md"
             
-            # Read token from environment if present to bypass rate limits / auth walls
-            github_token = os.environ.get("GITHUB_TOKEN")
-            if github_token:
-                curl_cmd.extend(["-H", f"Authorization: token {github_token}"])
-            
-            # Append target raw markdown URL from config
-            curl_cmd.append(config.GITHUB_README_URL)
+            if not os.path.exists(local_readme_path):
+                logger.error(f"Local README file not found at {local_readme_path}")
+                return []
 
-            result = subprocess.run(
-                curl_cmd,
-                capture_output=True,
-                text=True,
-                timeout=20,
-                check=True,
-            )
+            with open(local_readme_path, "r", encoding="utf-8") as f:
+                markdown = f.read()
 
-            markdown = result.stdout
             jobs = parse_readme(markdown)
-
-            logger.info(f"Parsed {len(jobs)} jobs from README")
+            logger.info(f"Successfully parsed {len(jobs)} jobs from local README mirror.")
             return jobs
 
-        except subprocess.CalledProcessError as e:
-            logger.error(f"curl failed (exit {e.returncode}): {e.stderr.strip()}")
-            return []
-        except subprocess.TimeoutExpired:
-            logger.error("README fetch timed out")
-            return []
         except Exception as e:
-            logger.exception(f"README fetch failed: {e}")
+            logger.exception(f"Local file parsing failed: {e}")
             return []
