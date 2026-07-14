@@ -87,7 +87,7 @@ class JobStore:
             with self._get_connection() as conn:
                 cursor = conn.execute(
                     """
-                    INSERT strO jobs (github_id, title, company, location, url, description, created_at, fetched_at, etag, status, similarity_score, external_url, cover_letter, application_result)
+                    INSERT INTo jobs (github_id, title, company, location, url, description, created_at, fetched_at, etag, status, similarity_score, external_url, cover_letter, application_result)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
