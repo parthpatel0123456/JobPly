@@ -46,10 +46,12 @@ def parse_readme(markdown):
 
         # Extract URL from HTML tag
         match = re.search(r'href="([^"]+)"', application)
-        url = match.group(1) if match else None
 
-        if not url:
-            continue
+        if match:
+            url = match.group(1)
+        else:
+            match = re.search(r'\((https?://[^)]+)\)', application)
+            url = match.group(1) if match else None
 
         # Prevent duplicate entries in the same parsing run
         job_id = generate_id(company, title, url)
