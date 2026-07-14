@@ -6,7 +6,11 @@ conn.row_factory = sqlite3.Row
 jobs = conn.execute("""
 SELECT title, company, location, created_at, similarity_score, url
 FROM jobs
-ORDER BY similarity_score DESC
+ORDER BY 
+    CASE 
+        WHEN created_at LIKE 'Jul %' THEN CAST(substr(created_at, 5) AS INTEGER)
+        ELSE 0
+    END DESC
 LIMIT 20
 """).fetchall()
 
