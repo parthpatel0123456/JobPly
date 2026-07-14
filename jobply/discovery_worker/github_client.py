@@ -11,15 +11,15 @@ class GitHubClient:
 
     def fetch_jobs(self):
         try:
-            # Build the base curl command
+            # Base curl command setup
             curl_cmd = ["curl", "-fsSL"]
             
-            # Check for a token in the environment and inject it if found
+            # Read token from environment if present to bypass rate limits / auth walls
             github_token = os.environ.get("GITHUB_TOKEN")
             if github_token:
                 curl_cmd.extend(["-H", f"Authorization: token {github_token}"])
             
-            # Append the target URL
+            # Append target raw markdown URL from config
             curl_cmd.append(config.GITHUB_README_URL)
 
             result = subprocess.run(

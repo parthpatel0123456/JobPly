@@ -3,7 +3,8 @@ Entry point for the JobPly discovery worker.
 """
 
 import logging
-from .poller import Poller
+# Change line 6 to:
+from discovery_worker.poller import Poller
 
 # Configure logging
 logging.basicConfig(
