@@ -19,8 +19,8 @@ print("=" * 100)
 
 for i, job in enumerate(jobs, 1):
     print(f"\n#{i}")
-    print(f"Title:       {job['title']}")
     print(f"Company:     {job['company']}")
+    print(f"Title:       {job['title']}")
     print(f"Location:    {job['location']}")
     print(f"Date Posted: {job['created_at']}")
     print(
